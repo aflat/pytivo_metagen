@@ -1,0 +1,28 @@
+.pyc
+
+# test movie files
+*.mpg
+*.avi
+*.ogm
+*.mkv
+*.mp4
+*.mov
+*.wmv
+*.vob
+*.m4v
+*.flv
+*.mpg.txt
+*.avi.txt
+*.ogm.txt
+*.mkv.txt
+*.mp4.txt
+*.mov.txt
+*.wmv.txt
+*.vob.txt
+*.m4v.txt
+*.flv.txt
+*.tivoseriesId
+
+# don't add my settings by accident
+pytivo_metagen.py.conf
+
