@@ -1,4 +1,4 @@
-.pyc
+*.pyc
 
 # test movie files
 *.mpg
@@ -21,7 +21,7 @@
 *.vob.txt
 *.m4v.txt
 *.flv.txt
-*.tivoseriesId
+*.tivoSeriesId
 
 # don't add my settings by accident
 pytivo_metagen.py.conf
