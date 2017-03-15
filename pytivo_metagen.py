@@ -41,6 +41,7 @@ import re
 import ConfigParser
 
 import logging
+
 import __builtin__
 __builtin__.RPCLOGLEVEL = logging.INFO
 import rpcSearch102
@@ -135,6 +136,7 @@ def PruneFiles(fileList):
 ##
 #################################################################################################
 def WriteMetaFile(filename,title ,seriesID,programID,episodeTitle,description):
+	logging.info("Writing metadata file: " + filename)
 	outfile = open(filename, 'w')
 	
 	outfile.write("title : " + title + "\n")
@@ -158,17 +160,19 @@ def WriteMetaFile(filename,title ,seriesID,programID,episodeTitle,description):
 def ProcessFiles(fileList):
 	for singleFile in fileList:
 		fileName = ntpath.basename(singleFile)
+		folderName = singleFile.replace(fileName,"")
+		logging.debug("Current folder: " + folderName)
 		seriesIdFilename = ""
 		logging.info("Going to process file: " +  fileName)
 		(series, season, episode, year, month, day) = ParseFileInfo(fileName)
-		seriesIdFilename = series + ".tivoSeriesId"
+		seriesIdFilename = folderName + series + ".tivoSeriesId"
 		seriesIdFileContents = None
 		if ( os.path.isfile(seriesIdFilename) ):
 			infile = open(seriesIdFilename, 'r')
 			seriesIdFileContents = infile.read()
 			infile.close()
 		seriesID,programID =  SearchMind(series, season, episode, seriesIdFileContents)
-		WriteMetaFile(fileName + ".txt" ,series,seriesID,programID,"Title should come from Tivo","Description should come from Tivo")
+		WriteMetaFile(folderName + fileName + ".txt" ,series,seriesID,programID,"Title should come from Tivo","Description should come from Tivo")
 		if ( not os.path.isfile(seriesIdFilename) ):
 			logging.info("Writing " + seriesIdFilename + " file")
 			outfile = open(seriesIdFilename, 'w')
@@ -259,7 +263,7 @@ def ParseFileInfo(fileName):
 #################################################################################################
 def GetConfig():
 
-	print "file: " + os.path.basename(__file__) + ".conf"
+	logging.debug( "conf file: " + os.path.basename(__file__) + ".conf")
 	with open(os.path.basename(__file__) + ".conf") as confFile:    
 		data = json.load(confFile)
 	tivoUsername = data['tivo_username']
@@ -294,8 +298,6 @@ def main():
 	parser = optparse.OptionParser(description='Gets metadata from tivo mind server')
 	parser.add_option('--folder', '-f', dest='folder',
 			help='folder to search for new metadata')
-	# parser.add_option('--parse', '-p', dest='parse',
-	# 		help='parse folder')
 	
 	options, args = parser.parse_args()
 
@@ -307,10 +309,13 @@ def main():
 
 	TIVOUSERNAME,TIVOPASSWORD,TIVOTSN = GetConfig()
 	allFilesList = GetAllFiles(options.folder)
-	logging.debug("All Files: " + str(allFilesList))
+	logging.debug( "All Files: " + str(allFilesList))
 	prunedFileList = PruneFiles(allFilesList)
-	logging.debug("Pruned Files: " + str(prunedFileList))
-	ProcessFiles(prunedFileList)
+	logging.debug(  "Pruned Files: " + str(prunedFileList))
+	if (len(prunedFileList) == 0):
+		logging.info("No files found to process")
+	else:
+		ProcessFiles(prunedFileList)
 
 if __name__ == "__main__":
 	main()
