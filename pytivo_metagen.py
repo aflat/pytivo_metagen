@@ -165,14 +165,22 @@ def ProcessFiles(fileList):
 		seriesIdFilename = ""
 		logging.info("Going to process file: " +  fileName)
 		(series, season, episode, year, month, day) = ParseFileInfo(fileName)
+		seriesOverrideFilename = folderName + series + ".tivoSeriesTitle"
+		if ( os.path.isfile(seriesOverrideFilename) ):
+			infile = open(seriesOverrideFilename, 'r')
+			seriesOverrideContents = infile.read().rstrip()
+			infile.close()
+			series = seriesOverrideContents
+
 		seriesIdFilename = folderName + series + ".tivoSeriesId"
 		seriesIdFileContents = None
 		if ( os.path.isfile(seriesIdFilename) ):
 			infile = open(seriesIdFilename, 'r')
-			seriesIdFileContents = infile.read()
+			seriesIdFileContents = infile.read().rstrip()
 			infile.close()
-		seriesID,programID =  SearchMind(series, season, episode, seriesIdFileContents)
-		WriteMetaFile(folderName + fileName + ".txt" ,series,seriesID,programID,"Title should come from Tivo","Description should come from Tivo")
+		seriesID,programID, programTitle =  SearchMind(series, season, episode, seriesIdFileContents)
+		seasonEpTitle = "S"+season.rjust(2,"0") + "E" +episode.rjust(2,"0")+ " - "+ programTitle
+		WriteMetaFile(folderName + fileName + ".txt" ,series,seriesID,programID,seasonEpTitle,"Description should come from Tivo")
 		if ( not os.path.isfile(seriesIdFilename) ):
 			logging.info("Writing " + seriesIdFilename + " file")
 			outfile = open(seriesIdFilename, 'w')
@@ -211,11 +219,12 @@ def SearchMind(seriesTitle, seasonNumber, episodeNumber , existingCollectionId=N
 	PPrintJson(episodeEPGInfo)
 	seriesID = episodeEPGInfo['content'][0]['partnerCollectionId'].encode('utf8').replace('epgProvider:cl.','')
 	programID = episodeEPGInfo['content'][0]['partnerContentId'].encode('utf8').replace('epgProvider:ct.','')
+	programTitle = episodeEPGInfo['content'][0]['subtitle'].encode('utf8')
 	logging.info("contentID: " + str(episodeEPGInfo['content'][0]['contentId']))
 	logging.info("collectionId: " + str(episodeEPGInfo['content'][0]['collectionId']))
 	logging.info("seriesID: " + seriesID)
 	logging.info("programID: " + programID)
-	return seriesID,programID
+	return seriesID,programID,programTitle
 	
 #################################################################################################
 ##
