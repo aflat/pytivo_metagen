@@ -212,14 +212,17 @@ def SearchMind(seriesTitle, seasonNumber, episodeNumber , existingCollectionId=N
 	else:
 		#tivo rpc needs the tivo.cl., tivo metadata needs SH
 		collectionId = existingCollectionId.replace("SH","tivo:cl.")
-	logging.debug( "COllection id we returned: " + collectionId)
+	logging.debug( "COllection id we returned: " + str(collectionId))
 
 	episodeEPGInfo = rpcSearch.EpisodeSearch(seriesTitle,collectionId,seasonNumber, episodeNumber)
 	logging.info("episode info dump:")
 	PPrintJson(episodeEPGInfo)
 	seriesID = episodeEPGInfo['content'][0]['partnerCollectionId'].encode('utf8').replace('epgProvider:cl.','')
 	programID = episodeEPGInfo['content'][0]['partnerContentId'].encode('utf8').replace('epgProvider:ct.','')
-	programTitle = episodeEPGInfo['content'][0]['subtitle'].encode('utf8')
+	try:
+		programTitle = episodeEPGInfo['content'][0]['subtitle'].encode('utf8')
+	except:
+		programTitle = episodeEPGInfo['content'][0]['title'].encode('utf8')
 	logging.info("contentID: " + str(episodeEPGInfo['content'][0]['contentId']))
 	logging.info("collectionId: " + str(episodeEPGInfo['content'][0]['collectionId']))
 	logging.info("seriesID: " + seriesID)

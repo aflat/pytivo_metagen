@@ -400,7 +400,7 @@ class Remote(object):
     return retCollectionID
 
   def EpisodeSearch(self, title, collectionId, season, ep, count=1):
-    logging.info("Episearch: " + title + " coll: " + collectionId + " sea: " + season + " ep: " + ep)
+    logging.info("Episearch: " + str(title) + " coll: " + str(collectionId) + " sea: " + season + " ep: " + ep)
     req = RpcRequest('contentSearch',
             collectionId = collectionId,
             title = title,
