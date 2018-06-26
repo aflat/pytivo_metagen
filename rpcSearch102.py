@@ -127,7 +127,7 @@ class Remote(object):
     self.tsn = mytsn
     self.buf = ''
     self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    self.ssl_socket = ssl.wrap_socket(self.socket, certfile='cdata.pem')
+    self.ssl_socket = ssl.wrap_socket(self.socket, keyfile='keys.key', certfile='cdata.pem')
     try:
       self.ssl_socket.connect((tivo_addr, tivo_port))
     except:
