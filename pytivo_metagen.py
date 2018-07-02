@@ -165,13 +165,15 @@ def ProcessFiles(fileList):
 		seriesIdFilename = ""
 		logging.info("Going to process file: " +  fileName)
 		(series, season, episode, year, month, day) = ParseFileInfo(fileName)
-		seriesOverrideFilename = folderName + series + ".tivoSeriesTitle"
+		seriesOverrideFilename = series + ".tivoSeriesTitle"
+		logging.info("Does a series override named: " + seriesOverrideFilename + " exist?")
 		if ( os.path.isfile(seriesOverrideFilename) ):
 			infile = open(seriesOverrideFilename, 'r')
 			seriesOverrideContents = infile.read().rstrip()
 			infile.close()
 			series = seriesOverrideContents
-
+			logging.info("Yes, title is overridden, with: " + series)
+		logging.info("Going to search for series: " + series)
 		seriesIdFilename = folderName + series + ".tivoSeriesId"
 		seriesIdFileContents = None
 		if ( os.path.isfile(seriesIdFilename) ):
@@ -217,6 +219,7 @@ def SearchMind(seriesTitle, seasonNumber, episodeNumber , existingCollectionId=N
 	episodeEPGInfo = rpcSearch.EpisodeSearch(seriesTitle,collectionId,seasonNumber, episodeNumber)
 	logging.info("episode info dump:")
 	PPrintJson(episodeEPGInfo)
+	logging.info("episide info already dumped:")
 	seriesID = episodeEPGInfo['content'][0]['partnerCollectionId'].encode('utf8').replace('epgProvider:cl.','')
 	programID = episodeEPGInfo['content'][0]['partnerContentId'].encode('utf8').replace('epgProvider:ct.','')
 	try:
